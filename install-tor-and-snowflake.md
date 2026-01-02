@@ -1,6 +1,6 @@
 在 macOS 上安装并使用 Tor 和 Snowflake 实现国际互联网访问
 
-本文档介绍如何在 macOS 上安装和配置 Tor 以及 Snowflake 客户端，以便能够访问国际互联网服务。Tor 是一个免费的开源软件，旨在实现匿名通信，而 Snowflake （参考链接：https://support.torproject.org/zh-CN/anti-censorship/what-is-snowflake/）是 Tor 网络中的一种桥接器，利用 WebRTC （）技术帮助用户绕过网络封锁。
+本文档介绍如何在 macOS 上安装和配置 Tor 以及 Snowflake 客户端，以便能够访问国际互联网服务。Tor 是一个免费的开源软件，旨在实现匿名通信，而 Snowflake （参考链接：https://support.torproject.org/zh-CN/anti-censorship/what-is-snowflake/） 是 Tor 网络中的一种桥接器，利用 WebRTC （webrtc.org）技术帮助用户连接到 Tor 网络从而绕过网络封锁。
 
 
 ## 最简单的安装方法（推荐初学者使用）
@@ -40,16 +40,16 @@
    cp /usr/local/etc/tor/torrc.example /usr/local/etc/tor/torrc
    nano /usr/local/etc/tor/torrc
    ```
-4. 在 `torrc` 文件中，添加以下配置以启用 SOCKS 和 HTTP 代理：
+4. 在 `torrc` 文件中，添加以下配置以启用 SOCKS 和 HTTP 隧道：
 - 仅供本机使用：
    ````
    SOCKSPort localhost:9050
-   HTTPTunnelPort localhost:9150
+   HTTPTunnelPort localhost:9150  # 主要供苹果手机使用
    ``````
-- 供局域网使用（根据需要修改主机名）：
+- 供局域网使用（根据需要修改 <your-macos-computername>）：
    ````
    SOCKSPort <<your-macos-computername>>.local:9050
-   HTTPTunnelPort <<your-macos-computername>>.local:9150
+   HTTPTunnelPort <<your-macos-computername>>.local:9150  # 主要供苹果手机使用
    ``````
 5. 配置 Snowflake 桥接器（参考链接：https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/tree/main/client?ref_type=heads）：
    ```
@@ -79,21 +79,21 @@
    ```bash
    nano ~/.bash_profile  # 如果使用 bash
    ```
-3. 添加以下行以设置环境变量：
+3. 添加以下行以设置环境变量，具体使用 socks5h:// 还是 http:// 协议依具体程序，常见程序一般都支持这两种协议：
    ```bash
    export ALL_PROXY="socks5h://localhost:9050"
-   export HTTP_PROXY="http://localhost:9150"
-   export HTTPS_PROXY="http://localhost:9150"
+   export HTTP_PROXY="socks5h://localhost:9150"
+   export HTTPS_PROXY="socks5h://localhost:9150"
    ```
 ## 设置个别程序使用 Tor 代理，不影响全局设置和其它程序
    ```bash
-   HTTP_PROXY="http://localhost:9150" HTTPS_PROXY="http://localhost:9150" git clone <repository-url>
+   HTTP_PROXY="socks5h://localhost:9150" HTTPS_PROXY="socks5h://localhost:9150" git clone <repository-url>
    ```
 ## 设置浏览器使用 Tor 代理
 1. 打开您常用的浏览器（如 Firefox 或 Chrome）。
 2. 配置浏览器的代理设置：
-   - SOCKS 代理：`localhost` 或 `<your-macos-computername>.local`，端口 `9050`
-   - HTTP 代理：`localhost` 或 `<your-macos-computername>.local`，端口 `9150`
+   - SOCKS 代理地址：`localhost` 或 `<your-macos-computername>.local`，端口 `9050`
+   - HTTP 代理地址：`localhost` 或 `<your-macos-computername>.local`，端口 `9150`
 3. 保存设置并访问 [https://check.torproject.org](https://check.torproject.org) 以验证连接是否通过 Tor。
 ## 设置 Git 使用 Tor 代理
 1. 在终端中运行以下命令以配置 Git 使用 Tor socks 代理（如果担心 DNS 泄漏，请务必使用 socks5h:// 协议：
@@ -107,7 +107,7 @@
    git config --global http.proxy 'socks5h://<your-macos-computername>.local:9050'
    git config --global https.proxy 'socks5h://<your-macos-computername>.local:9050'
    ```
-2. 在终端中运行以下命令配置 Git 使用 Tor http 代理（如果担心 DNS 泄漏，请务必使用 http:// 协议）：
+2. 在终端中运行以下命令配置 Git 使用 Tor http 代理（http:// 协议默认使用代理解析 DNS，不存在泄漏的问题）：
 - 本机使用：
    ```bash
    git config --global http.proxy 'http://localhost:9150'
@@ -179,7 +179,7 @@
   * 可以通过以下命令查看您的 macOS 计算机名：
     ```bash
     scutil --get LocalComputerName # 查询本地计算机名
-    scutil --set LocalComputerName <new-computer-name> # 设置新的本地计算机名
+    scutil --set LocalComputerName <your-macos-computername> # 设置新的本地计算机名
     ```
   * 或者：
     1. 在 macOS 上，打开“设置”。
