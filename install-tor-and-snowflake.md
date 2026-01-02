@@ -22,6 +22,21 @@
    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
    ```
 
+## 查看和编辑本地计算机名
+  * 可以通过以下命令查看您的 macOS 计算机名：
+    ```bash
+    scutil --get LocalComputerName # 查询本地计算机名
+    scutil --set LocalComputerName <your-macos-computername> # 设置新的本地计算机名
+    ```
+  * 或者：
+    1. 在 macOS 上，打开“设置”。
+    2. 在 “搜索” 框中输入 "hostname"。
+    3. 在搜索结果中找到并点击“共享”。
+    4. 在“计算机名”字段中查看您的本地计算机名。
+    5. 如果需要更改计算机名，可以点击“编辑”按钮进行修改。
+    6. 修改完成后，点击“好”保存更改。
+  * 这样就可以在其它局域网设备上使用 `<your-macos-computername>.local` 来访问您的 macOS 而不用担心 IP 地址变动导致无法访问的情况出现了。
+
 ## 使用 brew 安装 Snowflake（参考链接：https://snowflake.torproject.org/）
 1. 打开终端应用程序。
 2. 使用 Homebrew 安装 Snowflake：
@@ -58,9 +73,9 @@
    Bridge snowflake 192.0.2.4:80 8838024498816A039FCBBAB14E6F40A0843051FA fingerprint=8838024498816A039FCBBAB14E6F40A0843051FA url=https://1098762253.rsc.cdn77.org/ fronts=www.cdn77.com,www.phpmyadmin.net ice=stun:stun.antisip.com:3478,stun:stun.epygi.com:3478,stun:stun.uls.co.za:3478,stun:stun.voipgate.com:3478,stun:stun.mixvoip.com:3478,stun:stun.nextcloud.com:3478,stun:stun.bethesda.net:3478,stun:stun.nextcloud.com:443 utls-imitate=hellorandomizedalpn
    Bridge snowflake 192.0.2.3:80 2B280B23E1107BB62ABFC40DDCC8824814F80A72 fingerprint=2B280B23E1107BB62ABFC40DDCC8824814F80A72 url=https://1098762253.rsc.cdn77.org/ fronts=www.cdn77.com,www.phpmyadmin.net ice=stun:stun.antisip.com:3478,stun:stun.epygi.com:3478,stun:stun.uls.co.za:3478,stun:stun.voipgate.com:3478,stun:stun.mixvoip.com:3478,stun:stun.nextcloud.com:3478,stun:stun.bethesda.net:3478,stun:stun.nextcloud.com:443 utls-imitate=hellorandomizedalpn
    ```
-6. 启用 DNS 泄漏保护（可选但强烈推荐）：
+6. 启用 DNS 泄漏保护（可选但强烈推荐，设置后，Tor 程序会拒绝存在 DNS 泄漏的程序使用 Tor 网络）：
    ```
-   SafeSocks 1
+   SafeSocks 1  # 可能会导致程序连接到 Tor 代理端口时被拒绝
    ```
 7. 保存并关闭文件。
 8. 启动 Tor 服务：
@@ -79,7 +94,7 @@
    ```bash
    nano ~/.bash_profile  # 如果使用 bash
    ```
-3. 添加以下行以设置环境变量，具体使用 socks5h:// 还是 http:// 协议依具体程序，常见程序一般都支持这两种协议：
+3. 添加以下行以设置环境变量，具体使用 socks5h 还是 http 协议依具体程序，常见程序一般都支持这两种协议：
    ```bash
    export ALL_PROXY="socks5h://localhost:9050"
    export HTTP_PROXY="socks5h://localhost:9150"
@@ -96,28 +111,28 @@
    - HTTP 代理地址：`localhost` 或 `<your-macos-computername>.local`，端口 `9150`
 3. 保存设置并访问 [https://check.torproject.org](https://check.torproject.org) 以验证连接是否通过 Tor。
 ## 设置 Git 使用 Tor 代理
-1. 在终端中运行以下命令以配置 Git 使用 Tor socks 代理（如果担心 DNS 泄漏，请务必使用 socks5h:// 协议：
-- 本机使用：
-   ```bash
-   git config --global http.proxy 'socks5h://localhost:9050'
-   git config --global https.proxy 'socks5h://localhost:9050'
-   ```
-- 局域网使用：
-   ```bash
-   git config --global http.proxy 'socks5h://<your-macos-computername>.local:9050'
-   git config --global https.proxy 'socks5h://<your-macos-computername>.local:9050'
-   ```
-2. 在终端中运行以下命令配置 Git 使用 Tor http 代理（http:// 协议默认使用代理解析 DNS，不存在泄漏的问题）：
-- 本机使用：
-   ```bash
-   git config --global http.proxy 'http://localhost:9150'
-   git config --global https.proxy 'http://localhost:9150'
-   ```
-- 局域网使用：
-   ```bash
-   git config --global http.proxy 'http://<your-macos-computername>.local:9150'
-   git config --global https.proxy 'http://<your-macos-computername>.local:9150'
-   ```
+1. 在终端中运行以下命令以配置 Git 使用 Tor socks 代理（socks5 会导致 DNS 泄漏，请务必使用 socks5h 协议或 http 协议。参考链接：https://stackoverflow.com/questions/74813567/how-to-configure-gits-sock5-proxy-to-use-remote-dns-resolve）：
+   - 本机使用：
+     ```bash
+     git config --global http.proxy 'socks5h://localhost:9050'
+     git config --global https.proxy 'socks5h://localhost:9050'
+     ```
+   - 局域网使用：
+     ```bash
+     git config --global http.proxy 'socks5h://<your-macos-computername>.local:9050'
+     git config --global https.proxy 'socks5h://<your-macos-computername>.local:9050'
+     ```
+2. 在终端中运行以下命令配置 Git 使用 Tor http 代理（http 协议默认使用代理解析 DNS，不存在泄漏的问题）：
+   - 本机使用：
+     ```bash
+     git config --global http.proxy 'http://localhost:9150'
+     git config --global https.proxy 'http://localhost:9150'
+     ```
+   - 局域网使用：
+     ```bash
+     git config --global http.proxy 'http://<your-macos-computername>.local:9150'
+     git config --global https.proxy 'http://<your-macos-computername>.local:9150'
+     ```
 3. 验证 Git 代理设置：
    ```bash
    git config --global --get http.proxy
@@ -137,7 +152,7 @@
 2. 如果显示“您正在使用 Tor”，则说明配置成功。
 
 ## 其他配置选项
-1. 修改日志级别，方便定位问题：
+- 修改日志级别，方便定位问题：
    - 如果需要更改 Tor 的日志级别，可以在 `torrc` 文件中找到：
      ```
      #Log debug file /usr/local/var/log/tor/debug.log
@@ -154,6 +169,12 @@
         ```bash
         tail -f /usr/local/var/log/tor-debug.log
         ```
+- 开启 DNS 泄漏检测：
+   - 在 `torrc` 文件中添加以下行以启用 DNS 泄漏保护：
+     ```
+     TestSocks 1
+     ```
+   - 保存并关闭文件，然后重启 Tor 服务以应用更改。当使用 Tor 代理的程序尝试通过 Tor 网络连接目标服务时，Tor 会检测是否存在 DNS 泄漏并记录在日志中，参考链接：https://support.torproject.org/zh-CN/little-t-tor/troubleshooting/check-for-leaks/。
 - 可以根据需要调整 SOCKS 和 HTTP 代理的端口号，以避免端口冲突。
 - 确保防火墙允许所使用的端口进行通信。当局域网用户首次使用 <your-macos-computername>.local 或者 <your-macos-ip> 连接时，macOS 会询问是否接受外部连接，此时需要点击“接受”，Tor 代理才能被局域网用户连接使用。
 
@@ -175,21 +196,7 @@
   brew upgrade tor snowflake
   ```
 - **mDNS 和 .local 域名**：macOS 使用 mDNS（Multicast DNS）解析 `.local` 域名，这允许在本地网络中通过计算机名访问设备，而无需配置静态 IP 地址。确保您的计算机名正确设置，并且在局域网内其他设备上也能解析该名称。
-- **查看和编辑本地计算机名**：
-  * 可以通过以下命令查看您的 macOS 计算机名：
-    ```bash
-    scutil --get LocalComputerName # 查询本地计算机名
-    scutil --set LocalComputerName <your-macos-computername> # 设置新的本地计算机名
-    ```
-  * 或者：
-    1. 在 macOS 上，打开“设置”。
-    2. 在 “搜索” 框中输入 "hostname"。
-    3. 在搜索结果中找到并点击“共享”。
-    4. 在“计算机名”字段中查看您的本地计算机名。
-    5. 如果需要更改计算机名，可以点击“编辑”按钮进行修改。
-    6. 修改完成后，点击“好”保存更改。
-  * 这样就可以在其它局域网设备上使用 `<your-macos-computername>.local` 来访问您的 macOS 而不用担心 IP 地址变动导致无法访问的情况出现了。
-- ** 检查 <your-macos-computername>.local 解析是否正常**：
+- **<your-macos-computername>.local 解析错误**：
   - 在终端中使用以下命令检查 mDNS 解析是否正常工作：
     ```bash
     ping <your-macos-computername>.local
@@ -201,9 +208,8 @@
     sudo killall -HUP mDNSResponder
     ```
   - 稍等片刻后，再次尝试 ping 命令，看看是否能够正确解析。
-- **Socks5 和 Socks5h 的区别**：Socks5h 会通过代理服务器进行 DNS 解析，而 Socks5 则不会。如果您希望通过 Tor 进行 DNS 解析，请使用 Socks5h （参考链接：https://stackoverflow.com/questions/74813567/how-to-configure-gits-sock5-proxy-to-use-remote-dns-resolve）。
-- **应用程序 DNS 泄漏**：主要是指应用程序通过自身逻辑或其它外部程序完成 DNS 解析，只有连接目标服务时通过 Tor 完成，这样用户访问目标服务时的全部流程没有在 Tor 网络内进行，存在信息泄漏的问题。（参考链接：https://support.torproject.org/zh-CN/little-t-tor/troubleshooting/check-for-leaks/）
-- **Git 查看详细日志**：可以通过设置环境变量 `GIT_CURL_VERBOSE=1` 和 `GIT_CURL_VERBOSE=1` 来查看 Git 的详细日志信息，帮助排查问题。例如：
+- **应用程序 DNS 泄漏**：主要是指应用程序通过自身逻辑或其它外部程序完成 DNS 解析，只有连接目标服务时通过 Tor 完成，这样用户访问目标服务时的全部流程没有在 Tor 网络内进行，存在信息泄漏的问题（参考链接：https://support.torproject.org/zh-CN/little-t-tor/troubleshooting/check-for-leaks/）。当使用 socks5 协议时会存在 DNS 泄漏的问题，建议使用 socks5h、socks4、http 等代理协议以避免 DNS 泄漏。
+- **Git 查看详细日志**：通过临时设置环境变量 `GIT_CURL_VERBOSE=1` 和 `GIT_CURL_VERBOSE=1` 来查看 Git 的详细日志信息，帮助排查问题。例如：
   ```bash
   GIT_CURL_VERBOSE=1 GIT_VERBOSE=1 git clone <repository-url>
   ```
