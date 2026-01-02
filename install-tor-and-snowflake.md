@@ -227,6 +227,7 @@ Shadowrocket）来实现分流功能。
 - [Tor 官方安装指南（macOS）- 中文](https://support.torproject.org/zh-CN/little-t-tor/getting-started/installing/#macos)
 - [Tor 项目常见问题解答 - 中文](https://support.torproject.org/zh-CN/little-t-tor/troubleshooting/faq/)
 - [Tor 技术支持 - 中文](https://support.torproject.org/zh-CN/)
+- [Tor 技术文档 - 英文](https://spec.torproject.org/index.html)
 - [Tor 项目 GitLab](https://gitlab.torproject.org/)
 - [Tor 源码仓库](https://gitlab.torproject.org/tpo/core/tor)
 
